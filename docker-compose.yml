@@ -14,7 +14,7 @@ services:
       - vertocoin_data:/home/vertocoin/.vertocoin
       # - ./vertocoin.conf:/home/vertocoin/.vertocoin/vertocoin.conf:ro
     networks:
-      - vertocoin-network
+      - peercoin_vertocoin-network
     depends_on:
       - tor-proxy
     healthcheck:
@@ -50,7 +50,7 @@ services:
     volumes:
       - tor-data:/var/lib/tor
     networks:
-      - vertocoin-network
+      - peercoin_vertocoin-network
 
   # Tor SOCKS proxy for outbound connections
   tor-proxy:
@@ -60,7 +60,7 @@ services:
     ports:
       - "9050:9050" # SOCKS proxy port (bind to localhost only)
     networks:
-      - vertocoin-network
+      - peercoin_vertocoin-network
     environment:
       - TOR_OPTS=--SocksPort 0.0.0.0:9050
     healthcheck:
@@ -89,7 +89,7 @@ services:
       - BTCEXP_PRIVACY_MODE=false
       - BTCEXP_NO_INMEMORY_RPC_CACHE=true
     networks:
-      - vertocoin-network
+      - peercoin_vertocoin-network
     depends_on:
       - vertocoind
 
@@ -107,7 +107,7 @@ services:
     volumes:
       - vertocoin_data:/home/vertocoin/.vertocoin
     networks:
-      - vertocoin-network
+      - peercoin_vertocoin-network
     entrypoint:
       [
         "vertocoin-cli",
@@ -126,7 +126,7 @@ volumes:
     driver: local
 
 networks:
-  vertocoin-network:
+  peercoin_vertocoin-network:
     driver: bridge
     ipam:
       config:

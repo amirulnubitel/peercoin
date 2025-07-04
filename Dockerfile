@@ -61,7 +61,6 @@ RUN ./configure \
    --enable-cxx \
    --disable-shared \
    --with-pic \
-   --enable-upnp-default \
    --without-qrencode \
    --without-gui \
    --disable-qt \

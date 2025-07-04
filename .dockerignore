@@ -9,8 +9,13 @@
 *.md
 docs/
 
-# Test files
+# Test files (but keep config files needed for build)
 test/
+!test/config.ini.in
+!test/functional/test_runner.py
+!test/fuzz/test_runner.py
+!test/util/test_runner.py
+!test/util/rpcauth-test.py
 tests/
 ci/
 

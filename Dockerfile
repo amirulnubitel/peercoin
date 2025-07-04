@@ -47,11 +47,8 @@ COPY . .
 # Make build script executable
 RUN chmod +x build_vertocoin.sh
 
-# Ensure configure script is executable and avoid autogen.sh issues
-RUN chmod +x configure
-
-# Skip autogen.sh since we have pre-generated autotools files
-# The configure script and Makefile.in already exist in the repository
+# Generate configure script
+RUN ./autogen.sh
 
 # Configure build
 RUN ./configure \

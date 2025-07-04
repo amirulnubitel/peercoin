@@ -23,7 +23,6 @@ RUN apt-get update && apt-get install -y \
    libboost-all-dev \
    libdb5.3-dev \
    libdb5.3++-dev \
-   libminiupnpc-dev \
    libzmq3-dev \
    libqt5gui5 \
    libqt5core5a \
@@ -33,10 +32,14 @@ RUN apt-get update && apt-get install -y \
    libprotobuf-dev \
    protobuf-compiler \
    libqrencode-dev \
+   libnatpmp-dev \
+   libupnp-dev \
    git \
    curl \
    wget \
+   cmake \
    && rm -rf /var/lib/apt/lists/*
+
 
 # Set working directory
 WORKDIR /vertocoin
@@ -54,10 +57,17 @@ RUN ./autogen.sh
 RUN ./configure \
    --disable-tests \
    --disable-bench \
+   --with-miniupnpc \
+   --enable-cxx \
+   --disable-shared \
+   --with-pic \
+   --enable-upnp-default \
+   --without-qrencode \
    --without-gui \
-   --with-daemon \
-   --enable-hardening \
-   --disable-fuzz-binary
+   --disable-qt \
+   --enable-zmq \
+   --enable-wallet \
+   --enable-upnp-default
 
 # Build Vertocoin
 RUN make -j$(nproc)
@@ -72,12 +82,17 @@ RUN apt-get update && apt-get install -y \
    libboost-thread1.74.0 \
    libboost-chrono1.74.0 \
    libdb5.3++ \
-   libminiupnpc17 \
    libzmq5 \
    libevent-2.1-7 \
    libevent-pthreads-2.1-7 \
    libssl3 \
+   libnatpmp1 \
+   libupnp13 \
    && rm -rf /var/lib/apt/lists/*
+
+# Copy miniupnpc library from builder stage
+COPY --from=builder /usr/local/lib/libminiupnpc.* /usr/local/lib/
+RUN ldconfig
 
 # Create vertocoin user
 RUN useradd -r -m -s /bin/bash vertocoin

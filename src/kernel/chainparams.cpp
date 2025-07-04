@@ -1,8 +1,6 @@
 // Copyright (c) 2010 Satoshi Nakamoto
 // Copyright (c) 2009-2021 The Bitcoin Core developers
 // Copyright (c) 2011-2025 The Peercoin developers
-// Distributed under the MIT software license, see the accompanying
-// file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #include <kernel/chainparams.h>
 
@@ -93,15 +91,22 @@ static CBlock CreateGenesisBlock(uint32_t nTimeTx, uint32_t nTimeBlock, uint32_t
     const char* pszTimestamp = "Vertocoin start: 2025-07-01 - We build fast, secure, and private money.";
     const CScript genesisOutputScript = CScript(); // Empty script for coinbase
 
-    // Premine address: VNcR13uDx9XCVWnqQwEPWtEEniGKcXonTr
-    // This corresponds to the generated premine address hash160
-    std::vector<unsigned char> premineHash160 = ParseHex("83198204ec28de9532b087e65ab866e4c1ef1946");
+    // Premine address: VCNmB7ZUvzw9VeELQc3ZtRrdVSZsgAz4fw
+    // This corresponds to your generated premine address hash160
+    std::vector<unsigned char> premineHash160 = ParseHex("12d3443e51e18cb4bff1b243fd2b7c2a3c37b3f7");
     CScript premineOutputScript = CScript() << OP_DUP << OP_HASH160 << premineHash160 << OP_EQUALVERIFY << OP_CHECKSIG;
 
     const CAmount premineAmount = 5000000000 * COIN; // 5 billion VTO premine
 
     return CreateGenesisBlockWithPremine(pszTimestamp, genesisOutputScript, premineOutputScript, nTimeTx, nTimeBlock, nNonce, nBits, nVersion, genesisReward, premineAmount);
 }
+
+// static CBlock CreateGenesisBlock(uint32_t nTimeTx, uint32_t nTimeBlock, uint32_t nNonce, uint32_t nBits, int32_t nVersion, const CAmount& genesisReward)
+// {
+//     const char* pszTimestamp = "Vertocoin start: 2025-07-01 - We build fast, secure, and private money.";
+//     const CScript genesisOutputScript = CScript();
+//     return CreateGenesisBlock(pszTimestamp, genesisOutputScript, nTimeTx, nTimeBlock, nNonce, nBits, nVersion, genesisReward);
+// }
 
 /**
  * Main network on which people trade goods and services.
@@ -114,11 +119,14 @@ public:
         strNetworkID = CBaseChainParams::MAIN;
         consensus.signet_blocks = false;
         consensus.signet_challenge.clear();
-
-        consensus.BIP34Height = 1;                                                                                    // Activate immediately for new network
-        consensus.BIP34Hash = uint256S("0xc69f22a62d7c16f6ebfb257ecf6773f29258f0e2c3eb533cdbc0722e3a7bf1ea");         // Genesis hash
-        consensus.powLimit = uint256S("00000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffff");            // More reasonable limit for new network
-        consensus.bnInitialHashTarget = uint256S("0000000000ffffffffffffffffffffffffffffffffffffffffffffffffffffff"); // ~arith_uint256(0) >> 40;
+        // Additional height-based rules
+        consensus.BIP65Height = 0; // CLTV
+        consensus.BIP66Height = 0; // Strict DER
+        consensus.CSVHeight = 0;   // CheckSequenceVerify
+        consensus.BIP34Height = 0; // Activate immediately for new network
+        // consensus.BIP34Hash = uint256S("0x385705b8fd9f4a96b6bf85c7fd5fa30bc39f1a30db3fef44eb4baf1a28b83a75");         // Will be updated with new genesis hash
+        consensus.powLimit = uint256S("ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff");            // MAXIMUM difficulty (easiest) for bypass
+        consensus.bnInitialHashTarget = uint256S("ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"); // Same as powLimit
 
         // Copyright (c) 2025 The Vertocoin developers
         consensus.nTargetTimespan = 7 * 24 * 60 * 60;                         // one week
@@ -128,50 +136,51 @@ public:
         consensus.nStakeMinAge = 60 * 60 * 24 * 7;  // minimum age for coin age - 7 days
         consensus.nStakeMaxAge = 60 * 60 * 24 * 30; // 30 days
         consensus.nModifierInterval = 6 * 60 * 60;  // Modifier interval: time to elapse before new modifier is computed
-        consensus.nCoinbaseMaturity = 50;           // Faster maturity for high speed transfers
+        consensus.nCoinbaseMaturity = 0;            // Allow immediate spending of premine (genesis block)
 
-        consensus.fPowAllowMinDifficultyBlocks = false;
-        consensus.fPowNoRetargeting = false;
-        consensus.nRuleChangeActivationThreshold = 1815; // 90% of 2016
-        consensus.nMinerConfirmationWindow = 2016;       // nPowTargetTimespan / nPowTargetSpacing
+        consensus.fPowAllowMinDifficultyBlocks = true;   // Allows chain progress during low hash rate
+        consensus.fPowNoRetargeting = true;              // Disable retargeting until stable
+        consensus.nRuleChangeActivationThreshold = 1512; // 75% during bootstrap
+        consensus.nMinerConfirmationWindow = 1440;       // 1 day window at 1-min blocks
 
-        consensus.SegwitHeight = 1; // Activate immediately for new network
+        consensus.SegwitHeight = 0; // Activate immediately for new network
 
-        consensus.nMinimumChainWork = uint256S("0x000000000000000000000000000000000000000000000000000000000000000001"); // Start with minimal work
-        consensus.defaultAssumeValid = uint256S("0xc69f22a62d7c16f6ebfb257ecf6773f29258f0e2c3eb533cdbc0722e3a7bf1ea");  // Genesis hash
+        consensus.nMinimumChainWork = uint256S("0x0000000000000000000000000000000000000000000000000000000000000000"); // No minimum work for new network
+        consensus.defaultAssumeValid = consensus.hashGenesisBlock;                                                    // Use actual genesis hash
 
         /**
          * The message start string is designed to be unlikely to occur in normal data.
          * The characters are rarely used upper ASCII, not valid as UTF-8, and produce
          * a large 32-bit integer with any alignment.
          */
-        pchMessageStart[0] = 0xf1; // V for Vertocoin
-        pchMessageStart[1] = 0xf2; // T for Vertocoin
-        pchMessageStart[2] = 0xf3; // O for Vertocoin
-        pchMessageStart[3] = 0xf4; // Custom for Vertocoin
+        pchMessageStart[0] = 0x56; // 'V' in ASCII
+        pchMessageStart[1] = 0x45; // 'E'
+        pchMessageStart[2] = 0x52; // 'R'
+        pchMessageStart[3] = 0x01; // Network version 1
         nDefaultPort = 9333;
-        m_assumed_blockchain_size = 2;
+        m_assumed_blockchain_size = 3;
 
         // Create Genesis Block
-        genesis = CreateGenesisBlock(1751308800, 1751308800, 1, 0x207fffff, 1, 0 * COIN); // Very easy difficulty for genesis
+        genesis = CreateGenesisBlock(1751308800, 1751308800, 1, 0x207fffff, 1, 0); // No coinbase reward, all goes to premine
 
         consensus.hashGenesisBlock = genesis.GetHash();
 
         // Debug: Print actual values for verification
-        // printf("DEBUG: Actual consensus.hashGenesisBlock = 0x%s\n", consensus.hashGenesisBlock.GetHex().c_str());
-        // printf("DEBUG: Actual genesis.hashMerkleRoot = 0x%s\n", genesis.hashMerkleRoot.GetHex().c_str());
-        assert(consensus.hashGenesisBlock == uint256S("0xc69f22a62d7c16f6ebfb257ecf6773f29258f0e2c3eb533cdbc0722e3a7bf1ea"));
-        assert(genesis.hashMerkleRoot == uint256S("0xd1aa8253370d9338e616b01af5ccfb42bcab4e72df23bc01ba26eba0c3c1e863"));
+        // printf("DEBUG: NEW genesis hash = 0x%s\n", consensus.hashGenesisBlock.GetHex().c_str());
+        // printf("DEBUG: NEW merkle root = 0x%s\n", genesis.hashMerkleRoot.GetHex().c_str());
+        assert(consensus.hashGenesisBlock == uint256S("0x385705b8fd9f4a96b6bf85c7fd5fa30bc39f1a30db3fef44eb4baf1a28b83a75"));
+        assert(genesis.hashMerkleRoot == uint256S("0xf61f48fecdbeac7fa51a92246e18453c20e1b3d314031295e4bd2b3c22dcfaa3"));
 
         // Note that of those which support the service bits prefix, most only support a subset of
         // possible options.
         // This is fine at runtime as we'll fall back to using them as an addrfetch if they don't support the
         // service bits we want, but we should get them updated to support all service bits wanted by any
         // release ASAP to avoid it where possible.
+        // vSeeds.clear(); // No DNS seeds
+        // vFixedSeeds.clear();
         // Vertocoin seed nodes (replace with your own)
-        // vSeeds.emplace_back("explorer.vertomax.com");
-        vSeeds.clear(); // No DNS seeds
-        vFixedSeeds.clear();
+        vSeeds.emplace_back("explorer.vertomax.com");
+
 
         base58Prefixes[PUBKEY_ADDRESS] = std::vector<unsigned char>(1, 70);  // vertocoin: addresses begin with 'V'
         base58Prefixes[SCRIPT_ADDRESS] = std::vector<unsigned char>(1, 132); // vertocoin: script addresses begin with 'v'
@@ -192,9 +201,14 @@ public:
 
         checkpointData = {
             {
-                // Vertocoin genesis block with premine
-                {0, uint256S("0xc69f22a62d7c16f6ebfb257ecf6773f29258f0e2c3eb533cdbc0722e3a7bf1ea")}, // Genesis block with premine
+                // Vertocoin genesis block with premine to your address
+                {0, consensus.hashGenesisBlock}, // Use actual genesis block hash
             }};
+
+        // Debug: Verify checkpoint matches genesis hash
+        printf("DEBUG: Checkpoint hash for height 0 = 0x%s\n", checkpointData.mapCheckpoints.at(0).GetHex().c_str());
+        printf("DEBUG: Genesis hash matches checkpoint: %s\n",
+               (consensus.hashGenesisBlock == checkpointData.mapCheckpoints.at(0)) ? "YES" : "NO");
 
         m_assumeutxo_data = MapAssumeutxo{
             // TODO to be specified in a future patch.
@@ -203,9 +217,9 @@ public:
         chainTxData = ChainTxData{
             // Data as of genesis block (height 0) - Vertocoin network start
             1751308800, // * UNIX timestamp of genesis block (2025-07-01)
-            1,          // * total number of transactions at genesis (just the coinbase tx)
+            0,          // * total number of transactions at genesis (just the coinbase tx)
                         //   (the tx=... number in the ChainStateFlushed debug.log lines)
-            0.0         // * estimated number of transactions per second (starts at 0 for new network)
+            0           // * estimated number of transactions per second (starts at 0 for new network)
         };
     }
 };

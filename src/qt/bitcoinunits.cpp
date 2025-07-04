@@ -12,9 +12,8 @@
 
 static constexpr auto MAX_DIGITS_BTC = 16;
 
-BitcoinUnits::BitcoinUnits(QObject *parent):
-        QAbstractListModel(parent),
-        unitlist(availableUnits())
+BitcoinUnits::BitcoinUnits(QObject* parent) : QAbstractListModel(parent),
+                                              unitlist(availableUnits())
 {
 }
 
@@ -31,9 +30,9 @@ QList<BitcoinUnit> BitcoinUnits::availableUnits()
 QString BitcoinUnits::longName(Unit unit)
 {
     switch (unit) {
-    case Unit::BTC: return QString("PPC");
-    case Unit::mBTC: return QString("mPPC");
-    case Unit::uBTC: return QString::fromUtf8("μPPC");
+    case Unit::BTC: return QString("VTO");
+    case Unit::mBTC: return QString("mVTO");
+    case Unit::uBTC: return QString::fromUtf8("μVTO");
     case Unit::SAT: return QString("Satoshi (sat)");
     } // no default case, so the compiler can warn about missing cases
     assert(false);
@@ -53,9 +52,9 @@ QString BitcoinUnits::shortName(Unit unit)
 QString BitcoinUnits::description(Unit unit)
 {
     switch (unit) {
-    case Unit::BTC: return QString("Peercoins");
-    case Unit::mBTC: return QString("Milli-Peercoins (1 / 1" THIN_SP_UTF8 "000)");
-    case Unit::uBTC: return QString("Micro-Peercoins (bits) (1 / 1" THIN_SP_UTF8 "000" THIN_SP_UTF8 "000)");
+    case Unit::BTC: return QString("Vertocoin");
+    case Unit::mBTC: return QString("Milli-Vertocoin (1 / 1" THIN_SP_UTF8 "000)");
+    case Unit::uBTC: return QString("Micro-Vertocoin (bits) (1 / 1" THIN_SP_UTF8 "000" THIN_SP_UTF8 "000)");
     case Unit::SAT: return QString("Satoshi (sat) (1 / 100" THIN_SP_UTF8 "000" THIN_SP_UTF8 "000)");
     } // no default case, so the compiler can warn about missing cases
     assert(false);
@@ -162,31 +161,26 @@ bool BitcoinUnits::parse(Unit unit, const QString& value, CAmount* val_out)
     // Ignore spaces and thin spaces when parsing
     QStringList parts = removeSpaces(value).split(".");
 
-    if(parts.size() > 2)
-    {
+    if (parts.size() > 2) {
         return false; // More than one dot
     }
     QString whole = parts[0];
     QString decimals;
 
-    if(parts.size() > 1)
-    {
+    if (parts.size() > 1) {
         decimals = parts[1];
     }
-    if(decimals.size() > num_decimals)
-    {
+    if (decimals.size() > num_decimals) {
         return false; // Exceeds max precision
     }
     bool ok = false;
     QString str = whole + decimals.leftJustified(num_decimals, '0');
 
-    if(str.size() > 18)
-    {
+    if (str.size() > 18) {
         return false; // Longer numbers will exceed 63 bits
     }
     CAmount retvalue(str.toLongLong(&ok));
-    if(val_out)
-    {
+    if (val_out) {
         *val_out = retvalue;
     }
     return ok;
@@ -197,20 +191,18 @@ QString BitcoinUnits::getAmountColumnTitle(Unit unit)
     return QObject::tr("Amount") + " (" + shortName(unit) + ")";
 }
 
-int BitcoinUnits::rowCount(const QModelIndex &parent) const
+int BitcoinUnits::rowCount(const QModelIndex& parent) const
 {
     Q_UNUSED(parent);
     return unitlist.size();
 }
 
-QVariant BitcoinUnits::data(const QModelIndex &index, int role) const
+QVariant BitcoinUnits::data(const QModelIndex& index, int role) const
 {
     int row = index.row();
-    if(row >= 0 && row < unitlist.size())
-    {
+    if (row >= 0 && row < unitlist.size()) {
         Unit unit = unitlist.at(row);
-        switch(role)
-        {
+        switch (role) {
         case Qt::EditRole:
         case Qt::DisplayRole:
             return QVariant(longName(unit));

@@ -28,12 +28,15 @@ RUN apt-get update && apt-get install -y \
    libqt5core5a \
    libqt5dbus5 \
    qttools5-dev \
+   ccache \
    qttools5-dev-tools \
    libprotobuf-dev \
    protobuf-compiler \
    libqrencode-dev \
    libnatpmp-dev \
    libupnp-dev \
+   libsqlite3-dev \
+   libevent-pthreads-2.1-7 \
    git \
    curl \
    wget \
@@ -66,6 +69,7 @@ RUN ./configure \
    --disable-qt \
    --enable-zmq \
    --enable-wallet \
+   --enable-ccache \
    --enable-upnp-default
 
 # Build Vertocoin
@@ -87,6 +91,7 @@ RUN apt-get update && apt-get install -y \
    libssl3 \
    libnatpmp1 \
    libupnp13 \
+   libsqlite3-0 \
    && rm -rf /var/lib/apt/lists/*
 
 # Copy miniupnpc library from builder stage

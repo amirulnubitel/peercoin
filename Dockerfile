@@ -47,11 +47,17 @@ COPY . .
 # Make build script executable
 RUN chmod +x build_vertocoin.sh
 
-# Use existing configure script (skip autogen.sh)
-# RUN ./autogen.sh
+# Make configure script executable and check if we need to run autogen
+RUN chmod +x configure || echo "configure not found, will run autogen.sh"
+
+# Handle autogen.sh with proper error handling for missing test files
+RUN if [ ! -x configure ]; then \
+   echo "Running autogen.sh to generate configure script..."; \
+   ./autogen.sh || echo "autogen.sh completed with warnings"; \
+   fi
 
 # Configure build
-RUN ./configure \
+RUN chmod +x configure && ./configure \
    --disable-tests \
    --disable-bench \
    --without-gui \

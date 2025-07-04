@@ -1,0 +1,47 @@
+# Docker build artifacts
+.dockerignore
+
+# Version control
+.git
+.gitignore
+
+# Documentation
+*.md
+docs/
+
+# Test files
+test/
+tests/
+ci/
+
+# Build artifacts
+*.o
+*.a
+*.so
+*.dylib
+*.exe
+.deps/
+.libs/
+autom4te.cache/
+config.log
+config.status
+libtool
+Makefile
+src/config/bitcoin-config.h
+
+# Development files
+*.swp
+*.swo
+*~
+.vscode/
+.idea/
+
+# macOS
+.DS_Store
+
+# Temporary files
+tmp/
+temp/
+
+# Local configuration that shouldn't be in Docker
+local.conf

@@ -1,0 +1,61 @@
+version: "3.8"
+
+services:
+  vertocoind:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: vertocoin-node
+    restart: unless-stopped
+    ports:
+      - "9333:9333" # P2P port
+      - "9332:9332" # RPC port
+    volumes:
+      - vertocoin_data:/home/vertocoin/.vertocoin
+      - ./vertocoin.conf:/home/vertocoin/.vertocoin/vertocoin.conf:ro
+    environment:
+      - VERTOCOIN_PRINTTOCONSOLE=1
+    networks:
+      - vertocoin-network
+    healthcheck:
+      test: ["CMD", "vertocoin-cli", "getblockchaininfo"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "100m"
+        max-file: "3"
+
+  # Optional: Vertocoin CLI service for easy interaction
+  vertocoin-cli:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: vertocoin-cli
+    profiles:
+      - cli # Only start when explicitly requested
+    depends_on:
+      - vertocoind
+    volumes:
+      - vertocoin_data:/home/vertocoin/.vertocoin
+    networks:
+      - vertocoin-network
+    entrypoint: ["vertocoin-cli"]
+    command: ["--help"] # Default to showing help
+
+  # Optional: Explorer/monitoring service
+  # You can add a blockchain explorer here in the future
+
+volumes:
+  vertocoin_data:
+    driver: local
+
+networks:
+  vertocoin-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.50.0.0/16

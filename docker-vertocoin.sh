@@ -35,41 +35,41 @@ show_help() {
 
 build_image() {
     echo "Building Vertocoin Docker image..."
-    docker-compose build
+    docker compose build
     echo "Build completed!"
 }
 
 start_node() {
     echo "Starting Vertocoin node..."
-    docker-compose up -d vertocoind
+    docker compose up -d vertocoind
     echo "Vertocoin node started!"
     echo "Waiting for node to be ready..."
     sleep 10
-    docker-compose logs vertocoind
+    docker compose logs vertocoind
 }
 
 stop_node() {
     echo "Stopping Vertocoin node..."
-    docker-compose stop vertocoind
+    docker compose stop vertocoind
     echo "Vertocoin node stopped!"
 }
 
 restart_node() {
     echo "Restarting Vertocoin node..."
-    docker-compose restart vertocoind
+    docker compose restart vertocoind
     echo "Vertocoin node restarted!"
 }
 
 show_logs() {
-    docker-compose logs "${@:2}" vertocoind
+    docker compose logs "${@:2}" vertocoind
 }
 
 show_status() {
     echo "Container Status:"
-    docker-compose ps
+    docker compose ps
     echo ""
     echo "Node Info (if running):"
-    if docker-compose exec vertocoind vertocoin-cli getblockchaininfo 2>/dev/null; then
+    if docker compose exec vertocoind vertocoin-cli getblockchaininfo 2>/dev/null; then
         echo "Node is running and responsive"
     else
         echo "Node is not responding or not running"
@@ -78,26 +78,26 @@ show_status() {
 
 run_cli() {
     if [ $# -eq 1 ]; then
-        docker-compose exec vertocoind vertocoin-cli --help
+        docker compose exec vertocoind vertocoin-cli --help
     else
-        docker-compose exec vertocoind vertocoin-cli "${@:2}"
+        docker compose exec vertocoind vertocoin-cli "${@:2}"
     fi
 }
 
 open_shell() {
-    docker-compose exec vertocoind bash
+    docker compose exec vertocoind bash
 }
 
 clean_all() {
     echo "Stopping and removing containers..."
-    docker-compose down
+    docker compose down
     echo "Removing images..."
     docker rmi "${IMAGE_NAME}" 2>/dev/null || echo "Image not found"
     echo "Cleaning up unused volumes (optional)..."
     read -p "Do you want to remove data volumes? (y/N): " -n 1 -r
     echo
     if [[ $REPLY =~ ^[Yy]$ ]]; then
-        docker-compose down -v
+        docker compose down -v
         echo "Volumes removed!"
     fi
     echo "Cleanup completed!"

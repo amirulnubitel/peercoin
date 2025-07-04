@@ -59,6 +59,8 @@ services:
       - "9050:9050" # SOCKS proxy port (bind to localhost only)
     networks:
       - vertocoin-network
+    depends_on:
+      - vertocoind
     environment:
       - TOR_OPTS=--SocksPort 0.0.0.0:9050
     healthcheck:

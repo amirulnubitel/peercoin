@@ -12,7 +12,7 @@ services:
       - "9332:9332" # RPC port
     volumes:
       - vertocoin_data:/home/vertocoin/.vertocoin
-      # - ./vertocoin.conf:/home/vertocoin/.vertocoin/vertocoin.conf:ro
+      - ./vertocoin.conf:/home/vertocoin/.vertocoin/vertocoin.conf:ro
     networks:
       - peercoin_vertocoin-network
     healthcheck:
@@ -40,13 +40,15 @@ services:
     container_name: vertocoin-tor
     restart: always
     environment:
-      # VertoCoin node hidden service
-      - SERVICE1_TOR_SERVICE_HOSTS=80:vertocoin-core:9333
+      # VertoCoin node hidden service (corrected service name)
+      - SERVICE1_TOR_SERVICE_HOSTS=80:vertocoind:9333
       - SERVICE1_TOR_SERVICE_VERSION=3
       # Optional: Set a custom private key (leave empty for auto-generation)
       # - SERVICE1_TOR_SERVICE_KEY=<your_private_key>
     volumes:
       - tor-data:/var/lib/tor
+    depends_on:
+      - vertocoind
     networks:
       - peercoin_vertocoin-network
 
@@ -62,13 +64,13 @@ services:
     depends_on:
       - vertocoind
     environment:
-      - TOR_OPTS=--SocksPort 0.0.0.0:9050
+      - TOR_OPTS=--SocksPort 0.0.0.0:9050 --Log notice stdout
     healthcheck:
       test: ["CMD", "nc", "-z", "localhost", "9050"]
       interval: 30s
       timeout: 10s
       retries: 3
-      start_period: 10s
+      start_period: 30s
 
   explorer:
     image: amirulmus/vertomax-explore:latest

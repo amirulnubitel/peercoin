@@ -21,6 +21,7 @@ RUN apt-get update && apt-get install -y \
    python3 \
    python3-pip \
    libboost-all-dev \
+   libminiupnpc-dev \
    libdb5.3-dev \
    libdb5.3++-dev \
    libzmq3-dev \
@@ -33,7 +34,6 @@ RUN apt-get update && apt-get install -y \
    libprotobuf-dev \
    protobuf-compiler \
    libqrencode-dev \
-   libminiupnpc-dev \
    libcapnp-dev \
    capnproto \
    libnatpmp-dev \
@@ -45,6 +45,17 @@ RUN apt-get update && apt-get install -y \
    wget \
    cmake \
    && rm -rf /var/lib/apt/lists/*
+
+# Install compatible version of miniupnpc from source (not the system package)
+# RUN cd /tmp && \
+#     wget http://miniupnp.free.fr/files/miniupnpc-2.0.tar.gz && \
+#     tar -xzf miniupnpc-2.0.tar.gz && \
+#     cd miniupnpc-2.0 && \
+#     make && \
+#     make install && \
+#     ldconfig && \
+#     cd / && \
+#     rm -rf /tmp/miniupnpc-*
 
 
 # Set working directory
@@ -63,7 +74,7 @@ RUN ./autogen.sh
 RUN ./configure \
    --disable-tests \
    --disable-bench \
-   --with-miniupnpc \
+   --without-miniupnpc \
    --enable-cxx \
    --disable-shared \
    --with-pic \

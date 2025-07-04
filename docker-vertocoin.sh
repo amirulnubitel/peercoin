@@ -69,7 +69,7 @@ show_status() {
     docker compose ps
     echo ""
     echo "Node Info (if running):"
-    if docker compose exec vertocoind vertocoin-cli getblockchaininfo 2>/dev/null; then
+    if docker compose exec vertocoind vertocoin-cli -rpcuser=vertouser -rpcpassword=vertouser2025 getblockchaininfo 2>/dev/null; then
         echo "Node is running and responsive"
     else
         echo "Node is not responding or not running"
@@ -78,9 +78,9 @@ show_status() {
 
 run_cli() {
     if [ $# -eq 1 ]; then
-        docker compose exec vertocoind vertocoin-cli --help
+        docker compose exec vertocoind vertocoin-cli -rpcuser=vertouser -rpcpassword=vertouser2025 --help
     else
-        docker compose exec vertocoind vertocoin-cli "${@:2}"
+        docker compose exec vertocoind vertocoin-cli -rpcuser=vertouser -rpcpassword=vertouser2025 "${@:2}"
     fi
 }
 

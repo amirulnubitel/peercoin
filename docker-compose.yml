@@ -12,13 +12,20 @@ services:
       - "9332:9332" # RPC port
     volumes:
       - vertocoin_data:/home/vertocoin/.vertocoin
-      - ./vertocoin.conf:/home/vertocoin/.vertocoin/vertocoin.conf:ro
+      # - ./vertocoin.conf:/home/vertocoin/.vertocoin/vertocoin.conf:ro
     environment:
       - VERTOCOIN_PRINTTOCONSOLE=1
     networks:
       - vertocoin-network
     healthcheck:
-      test: ["CMD", "vertocoin-cli", "getblockchaininfo"]
+      test:
+        [
+          "CMD",
+          "vertocoin-cli",
+          "-rpcuser=vertouser",
+          "-rpcpassword=vertouser2025",
+          "getblockchaininfo",
+        ]
       interval: 30s
       timeout: 10s
       retries: 3

@@ -47,12 +47,8 @@ COPY . .
 # Make build script executable
 RUN chmod +x build_vertocoin.sh
 
-# Ensure all test files are present and generate configure script
-RUN ls -la test/ && \
-   ls -la test/functional/ && \
-   ls -la test/util/ && \
-   ls -la test/fuzz/ && \
-   ./autogen.sh
+# Generate configure script
+RUN ./autogen.sh
 
 # Configure build
 RUN ./configure \

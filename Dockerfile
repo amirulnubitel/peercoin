@@ -47,8 +47,8 @@ COPY . .
 # Make build script executable
 RUN chmod +x build_vertocoin.sh
 
-# Generate configure script
-RUN ./autogen.sh
+# Use existing configure script (skip autogen.sh)
+# RUN ./autogen.sh
 
 # Configure build
 RUN ./configure \

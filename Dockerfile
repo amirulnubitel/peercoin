@@ -24,6 +24,7 @@ RUN apt-get update && apt-get install -y \
    libminiupnpc-dev \
    libdb5.3-dev \
    libdb5.3++-dev \
+   db5.3-util \
    libzmq3-dev \
    libqt5gui5 \
    libqt5core5a \
@@ -72,7 +73,10 @@ RUN ./configure \
    --enable-zmq \
    --enable-wallet \
    --enable-ccache \
-   --enable-upnp-default
+   --enable-upnp-default \
+   --with-incompatible-bdb \
+   BDB_LIBS="-ldb_cxx-5.3" \
+   BDB_CFLAGS="-I/usr/include/db5.3"
 
 # Build Vertocoin
 RUN make -j$(nproc)

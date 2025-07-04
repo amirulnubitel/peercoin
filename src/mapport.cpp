@@ -153,9 +153,9 @@ static bool ProcessUpnp()
 {
     bool ret = false;
     std::string port = strprintf("%u", GetListenPort());
-    const char * multicastif = nullptr;
-    const char * minissdpdpath = nullptr;
-    struct UPNPDev * devlist = nullptr;
+    const char* multicastif = nullptr;
+    const char* minissdpdpath = nullptr;
+    struct UPNPDev* devlist = nullptr;
     char lanaddr[64];
 
     int error = 0;
@@ -165,9 +165,12 @@ static bool ProcessUpnp()
     struct IGDdatas data;
     int r;
 
+#if MINIUPNPC_API_VERSION >= 14
+    r = UPNP_GetValidIGD(devlist, &urls, &data, lanaddr, sizeof(lanaddr), nullptr, 0);
+#else
     r = UPNP_GetValidIGD(devlist, &urls, &data, lanaddr, sizeof(lanaddr));
-    if (r == 1)
-    {
+#endif
+    if (r == 1) {
         if (fDiscover) {
             char externalIPAddress[40];
             r = UPNP_GetExternalIPAddress(urls.controlURL, data.first.servicetype, externalIPAddress);
@@ -204,11 +207,13 @@ static bool ProcessUpnp()
 
         r = UPNP_DeletePortMapping(urls.controlURL, data.first.servicetype, port.c_str(), "TCP", nullptr);
         LogPrintf("UPNP_DeletePortMapping() returned: %d\n", r);
-        freeUPNPDevlist(devlist); devlist = nullptr;
+        freeUPNPDevlist(devlist);
+        devlist = nullptr;
         FreeUPNPUrls(&urls);
     } else {
         LogPrintf("No valid UPnP IGDs found\n");
-        freeUPNPDevlist(devlist); devlist = nullptr;
+        freeUPNPDevlist(devlist);
+        devlist = nullptr;
         if (r != 0)
             FreeUPNPUrls(&urls);
     }

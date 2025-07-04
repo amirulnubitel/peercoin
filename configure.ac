@@ -5,14 +5,14 @@ define(_CLIENT_VERSION_BUILD, 0)
 define(_CLIENT_VERSION_RC, 0)
 define(_CLIENT_VERSION_IS_RELEASE, true)
 define(_COPYRIGHT_YEAR, 2025)
-define(_PEERCOIN_VERSION_MAJOR, 0)
-define(_PEERCOIN_VERSION_MINOR, 15)
-define(_PEERCOIN_VERSION_REVISION, 1)
+define(_PEERCOIN_VERSION_MAJOR, 1)
+define(_PEERCOIN_VERSION_MINOR, 0)
+define(_PEERCOIN_VERSION_REVISION, 0)
 define(_PEERCOIN_VERSION_BUILD, 0)
 define(_PEERCOIN_VERSION_RC, 0)
 define(_COPYRIGHT_HOLDERS,[The %s developers])
-define(_COPYRIGHT_HOLDERS_SUBSTITUTION,[[Peercoin]])
-AC_INIT([Peercoin],m4_join([.], _PEERCOIN_VERSION_MAJOR._PEERCOIN_VERSION_MINOR._PEERCOIN_VERSION_REVISION, m4_if(_PEERCOIN_VERSION_BUILD, [0], [], _PEERCOIN_VERSION_BUILD))m4_if(_PEERCOIN_VERSION_RC, [0], [], [rc]_PEERCOIN_VERSION_RC),[https://github.com/peercoin/peercoin/issues],[peercoin],[https://peercoin.net/])
+define(_COPYRIGHT_HOLDERS_SUBSTITUTION,[[Vertocoin]])
+AC_INIT([Vertocoin],m4_join([.], _PEERCOIN_VERSION_MAJOR._PEERCOIN_VERSION_MINOR._PEERCOIN_VERSION_REVISION, m4_if(_PEERCOIN_VERSION_BUILD, [0], [], _PEERCOIN_VERSION_BUILD))m4_if(_PEERCOIN_VERSION_RC, [0], [], [rc]_PEERCOIN_VERSION_RC),[https://github.com/vertocoin/vertocoin/issues],[vertocoin],[https://vertocoin.net/])
 AC_CONFIG_SRCDIR([src/validation.cpp])
 AC_CONFIG_HEADERS([src/config/bitcoin-config.h])
 AC_CONFIG_AUX_DIR([build-aux])
@@ -34,17 +34,17 @@ if test -n "$PKG_CONFIG_LIBDIR"; then
   PKG_CONFIG="env PKG_CONFIG_LIBDIR=$PKG_CONFIG_LIBDIR $PKG_CONFIG"
 fi
 
-BITCOIN_DAEMON_NAME=peercoind
-BITCOIN_GUI_NAME=peercoin-qt
-BITCOIN_TEST_NAME=test_peercoin
-BITCOIN_CLI_NAME=peercoin-cli
-BITCOIN_TX_NAME=peercoin-tx
-BITCOIN_UTIL_NAME=peercoin-util
-BITCOIN_CHAINSTATE_NAME=peercoin-chainstate
-BITCOIN_WALLET_TOOL_NAME=peercoin-wallet
+BITCOIN_DAEMON_NAME=vertocoind
+BITCOIN_GUI_NAME=vertocoin-qt
+BITCOIN_TEST_NAME=test_vertocoin
+BITCOIN_CLI_NAME=vertocoin-cli
+BITCOIN_TX_NAME=vertocoin-tx
+BITCOIN_UTIL_NAME=vertocoin-util
+BITCOIN_CHAINSTATE_NAME=vertocoin-chainstate
+BITCOIN_WALLET_TOOL_NAME=vertocoin-wallet
 dnl Multi Process
-BITCOIN_MP_NODE_NAME=peercoin-node
-BITCOIN_MP_GUI_NAME=peercoin-gui
+BITCOIN_MP_NODE_NAME=vertocoin-node
+BITCOIN_MP_GUI_NAME=vertocoin-gui
 
 dnl Unless the user specified ARFLAGS, force it to be cr
 dnl This is also the default as-of libtool 2.4.7

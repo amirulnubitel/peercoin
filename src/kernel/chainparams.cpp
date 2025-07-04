@@ -48,6 +48,35 @@ static CBlock CreateGenesisBlock(const char* pszTimestamp, const CScript& genesi
     return genesis;
 }
 
+static CBlock CreateGenesisBlockWithPremine(const char* pszTimestamp, const CScript& genesisOutputScript, const CScript& premineOutputScript, uint32_t nTimeTx, uint32_t nTimeBlock, uint32_t nNonce, uint32_t nBits, int32_t nVersion, const CAmount& genesisReward, const CAmount& premineAmount)
+{
+    CMutableTransaction txNew;
+    txNew.nVersion = 1;
+    txNew.vin.resize(1);
+    txNew.vout.resize(2); // Two outputs: normal coinbase + premine
+    txNew.vin[0].scriptSig = CScript() << 486604799 << CScriptNum(9999) << std::vector<unsigned char>((const unsigned char*)pszTimestamp, (const unsigned char*)pszTimestamp + strlen(pszTimestamp));
+
+    // Standard coinbase output
+    txNew.vout[0].nValue = genesisReward;
+    txNew.vout[0].scriptPubKey = genesisOutputScript;
+
+    // Premine output - this will be spendable!
+    txNew.vout[1].nValue = premineAmount;
+    txNew.vout[1].scriptPubKey = premineOutputScript;
+
+    txNew.nTime = nTimeTx;
+
+    CBlock genesis;
+    genesis.nTime = nTimeBlock;
+    genesis.nBits = nBits;
+    genesis.nNonce = nNonce;
+    genesis.nVersion = nVersion;
+    genesis.vtx.push_back(MakeTransactionRef(std::move(txNew)));
+    genesis.hashPrevBlock.SetNull();
+    genesis.hashMerkleRoot = BlockMerkleRoot(genesis);
+    return genesis;
+}
+
 /**
  * Build the genesis block. Note that the output of its generation
  * transaction cannot be spent since it did not originally exist in the
@@ -61,9 +90,17 @@ static CBlock CreateGenesisBlock(const char* pszTimestamp, const CScript& genesi
  */
 static CBlock CreateGenesisBlock(uint32_t nTimeTx, uint32_t nTimeBlock, uint32_t nNonce, uint32_t nBits, int32_t nVersion, const CAmount& genesisReward)
 {
-    const char* pszTimestamp = "Vertocoin 04-JUL-2025 High Speed Private Cryptocurrency for the Future";
-    const CScript genesisOutputScript = CScript();
-    return CreateGenesisBlock(pszTimestamp, genesisOutputScript, nTimeTx, nTimeBlock, nNonce, nBits, nVersion, genesisReward);
+    const char* pszTimestamp = "Vertocoin start: 2025-07-01 - We build fast, secure, and private money.";
+    const CScript genesisOutputScript = CScript(); // Empty script for coinbase
+
+    // Premine address: VNcR13uDx9XCVWnqQwEPWtEEniGKcXonTr
+    // This corresponds to the generated premine address hash160
+    std::vector<unsigned char> premineHash160 = ParseHex("83198204ec28de9532b087e65ab866e4c1ef1946");
+    CScript premineOutputScript = CScript() << OP_DUP << OP_HASH160 << premineHash160 << OP_EQUALVERIFY << OP_CHECKSIG;
+
+    const CAmount premineAmount = 5000000000 * COIN; // 5 billion VTO premine
+
+    return CreateGenesisBlockWithPremine(pszTimestamp, genesisOutputScript, premineOutputScript, nTimeTx, nTimeBlock, nNonce, nBits, nVersion, genesisReward, premineAmount);
 }
 
 /**
@@ -77,43 +114,10 @@ public:
         strNetworkID = CBaseChainParams::MAIN;
         consensus.signet_blocks = false;
         consensus.signet_challenge.clear();
-        /*
-                consensus.nSubsidyHalvingInterval = 210000;
-                consensus.script_flag_exceptions.emplace( // BIP16 exception
-                    uint256S("0x00000000000002dc756eebf4f49723ed8d30cc28a5f108eb94b1ba88ac4f9c22"), SCRIPT_VERIFY_NONE);
-                consensus.script_flag_exceptions.emplace( // Taproot exception
-                    uint256S("0x0000000000000000000f14c35b2d841e986ab5441de8c585d5ffe55ea1e395ad"), SCRIPT_VERIFY_P2SH | SCRIPT_VERIFY_WITNESS);
-                consensus.BIP34Height = 227931;
-                consensus.BIP34Hash = uint256S("0x000000000000024b89b42a942fe0d9fea3bb44ab7bd1b19115dd6a759c0808b8");
-                consensus.BIP65Height = 388381; // 000000000000000004c2b624ed5d7756c508d90fd0da2c7c679febfa6c4735f0
-                consensus.BIP66Height = 363725; // 00000000000000000379eaa19dce8c9b722d46ae6a57c2f1a988119488b50931
-                consensus.CSVHeight = 419328; // 000000000000000004a1b34462cb8aeebd5799177f7a29cf28f2d1961716b5b5
-                consensus.SegwitHeight = 481824; // 0000000000000000001c8018d9cb3b742ef25114f27563e3fc4a1902167f9893
-                consensus.MinBIP9WarningHeight = 483840; // segwit activation height + miner confirmation window
-                consensus.powLimit = uint256S("00000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffff");
-                consensus.nTargetTimespan = 7 * 24 * 60 * 60; // two weeks
-                consensus.nPowTargetSpacing = 10 * 60;
-                consensus.fPowAllowMinDifficultyBlocks = false;
-                consensus.fPowNoRetargeting = false;
-                consensus.nRuleChangeActivationThreshold = 1815; // 90% of 2016
-                consensus.nMinerConfirmationWindow = 2016; // nPowTargetTimespan / nPowTargetSpacing
-                consensus.vDeployments[Consensus::DEPLOYMENT_TESTDUMMY].bit = 28;
-                consensus.vDeployments[Consensus::DEPLOYMENT_TESTDUMMY].nStartTime = Consensus::BIP9Deployment::NEVER_ACTIVE;
-                consensus.vDeployments[Consensus::DEPLOYMENT_TESTDUMMY].nTimeout = Consensus::BIP9Deployment::NO_TIMEOUT;
-                consensus.vDeployments[Consensus::DEPLOYMENT_TESTDUMMY].min_activation_height = 0; // No activation delay
 
-                // Deployment of Taproot (BIPs 340-342)
-                consensus.vDeployments[Consensus::DEPLOYMENT_TAPROOT].bit = 2;
-                consensus.vDeployments[Consensus::DEPLOYMENT_TAPROOT].nStartTime = 1619222400; // April 24th, 2021
-                consensus.vDeployments[Consensus::DEPLOYMENT_TAPROOT].nTimeout = 1628640000; // August 11th, 2021
-                consensus.vDeployments[Consensus::DEPLOYMENT_TAPROOT].min_activation_height = 709632; // Approximately November 12th, 2021
-
-                consensus.nMinimumChainWork = uint256S("0x000000000000000000000000000000000000000044a50fe819c39ad624021859");
-                consensus.defaultAssumeValid = uint256S("0x000000000000000000035c3f0d31e71a5ee24c5aaf3354689f65bd7b07dee632"); // 784000
-        */
-        consensus.BIP34Height = 339994;
-        consensus.BIP34Hash = uint256S("000000000000000237f50af4cfe8924e8693abc5bd8ae5abb95bc6d230f5953f");
-        consensus.powLimit = uint256S("00000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffff");            // ~arith_uint256(0) >> 32;
+        consensus.BIP34Height = 1;                                                                                    // Activate immediately for new network
+        consensus.BIP34Hash = uint256S("0xc69f22a62d7c16f6ebfb257ecf6773f29258f0e2c3eb533cdbc0722e3a7bf1ea");         // Genesis hash
+        consensus.powLimit = uint256S("00000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffff");            // More reasonable limit for new network
         consensus.bnInitialHashTarget = uint256S("0000000000ffffffffffffffffffffffffffffffffffffffffffffffffffffff"); // ~arith_uint256(0) >> 40;
 
         // Copyright (c) 2025 The Vertocoin developers
@@ -131,10 +135,10 @@ public:
         consensus.nRuleChangeActivationThreshold = 1815; // 90% of 2016
         consensus.nMinerConfirmationWindow = 2016;       // nPowTargetTimespan / nPowTargetSpacing
 
-        consensus.SegwitHeight = 455470;
+        consensus.SegwitHeight = 1; // Activate immediately for new network
 
-        consensus.nMinimumChainWork = uint256S("0x000000000000000000000000000000000000000000000000006c0ada6e6d2117");  // 750000
-        consensus.defaultAssumeValid = uint256S("0xd5dce1eaccc3f4894ae235123ebea393d74c1ddd1aaa4d8c7a814a1ba0b69ad4"); // 750000
+        consensus.nMinimumChainWork = uint256S("0x000000000000000000000000000000000000000000000000000000000000000001"); // Start with minimal work
+        consensus.defaultAssumeValid = uint256S("0xc69f22a62d7c16f6ebfb257ecf6773f29258f0e2c3eb533cdbc0722e3a7bf1ea");  // Genesis hash
 
         /**
          * The message start string is designed to be unlikely to occur in normal data.
@@ -148,12 +152,16 @@ public:
         nDefaultPort = 9333;
         m_assumed_blockchain_size = 2;
 
-        genesis = CreateGenesisBlock(1720080000, 1720080000, 1, 0x1e0ffff0, 1, 5000000000 * COIN); // 5 billion VTO initial supply
+        // Create Genesis Block
+        genesis = CreateGenesisBlock(1751308800, 1751308800, 1, 0x207fffff, 1, 0 * COIN); // Very easy difficulty for genesis
+
         consensus.hashGenesisBlock = genesis.GetHash();
-        // Note: You will need to mine a new genesis block and update these hashes
-        // For now, we'll comment out the assertions until the new genesis is mined
-        // assert(consensus.hashGenesisBlock == uint256S("0x0000000032fe677166d54963b62a4677d8957e87c508eaa4fd7eb1c880cd27e3"));
-        // assert(genesis.hashMerkleRoot == uint256S("0x3c2d8f85fab4d17aac558cc648a1a58acff0de6deb890c29985690052c5993c2"));
+
+        // Debug: Print actual values for verification
+        // printf("DEBUG: Actual consensus.hashGenesisBlock = 0x%s\n", consensus.hashGenesisBlock.GetHex().c_str());
+        // printf("DEBUG: Actual genesis.hashMerkleRoot = 0x%s\n", genesis.hashMerkleRoot.GetHex().c_str());
+        assert(consensus.hashGenesisBlock == uint256S("0xc69f22a62d7c16f6ebfb257ecf6773f29258f0e2c3eb533cdbc0722e3a7bf1ea"));
+        assert(genesis.hashMerkleRoot == uint256S("0xd1aa8253370d9338e616b01af5ccfb42bcab4e72df23bc01ba26eba0c3c1e863"));
 
         // Note that of those which support the service bits prefix, most only support a subset of
         // possible options.
@@ -161,7 +169,9 @@ public:
         // service bits we want, but we should get them updated to support all service bits wanted by any
         // release ASAP to avoid it where possible.
         // Vertocoin seed nodes (replace with your own)
-        vSeeds.emplace_back("explorer.vertomax.com");
+        // vSeeds.emplace_back("explorer.vertomax.com");
+        vSeeds.clear(); // No DNS seeds
+        vFixedSeeds.clear();
 
         base58Prefixes[PUBKEY_ADDRESS] = std::vector<unsigned char>(1, 70);  // vertocoin: addresses begin with 'V'
         base58Prefixes[SCRIPT_ADDRESS] = std::vector<unsigned char>(1, 132); // vertocoin: script addresses begin with 'v'
@@ -174,7 +184,7 @@ public:
 
         vFixedSeeds = std::vector<uint8_t>(std::begin(chainparams_seed_main), std::end(chainparams_seed_main));
 
-        fMiningRequiresPeers = true;
+        fMiningRequiresPeers = false; // Allow solo mining for new network startup
         fDefaultConsistencyChecks = false;
         fRequireStandard = true;
         m_is_test_chain = false;
@@ -182,9 +192,8 @@ public:
 
         checkpointData = {
             {
-                // Vertocoin checkpoints will be added here as the network grows
-                // For now, only genesis block
-                {0, uint256S("0x0000000000000000000000000000000000000000000000000000000000000000")}, // Placeholder - will be updated after genesis mining
+                // Vertocoin genesis block with premine
+                {0, uint256S("0xc69f22a62d7c16f6ebfb257ecf6773f29258f0e2c3eb533cdbc0722e3a7bf1ea")}, // Genesis block with premine
             }};
 
         m_assumeutxo_data = MapAssumeutxo{
@@ -192,12 +201,11 @@ public:
         };
 
         chainTxData = ChainTxData{
-            // Data as of block 4cf53c51bbefa0a4c30a73609ab115276e33e9e696ea056f46e9ead36d4209b1 (height 801334).
-            1743098457, // * UNIX timestamp of last known number of transactions
-            2618324,    // * total number of transactions between genesis and that timestamp
+            // Data as of genesis block (height 0) - Vertocoin network start
+            1751308800, // * UNIX timestamp of genesis block (2025-07-01)
+            1,          // * total number of transactions at genesis (just the coinbase tx)
                         //   (the tx=... number in the ChainStateFlushed debug.log lines)
-            0.006583698 // * estimated number of transactions per second after that timestamp
-                        //   2618324/(1743098457-1345400356) = 0.006583698
+            0.0         // * estimated number of transactions per second (starts at 0 for new network)
         };
     }
 };
@@ -245,6 +253,7 @@ public:
         m_assumed_blockchain_size = 1;
 
         genesis = CreateGenesisBlock(1720080000, 1720080000, 1, 0x1e0ffff0, 1, 1000000000 * COIN); // 1 billion VTO testnet initial supply
+
         consensus.hashGenesisBlock = genesis.GetHash();
         // Testnet genesis will also need to be mined
         // assert(consensus.hashGenesisBlock == uint256S("0x00000001f757bb737f6596503e17cd17b0658ce630cc727c0cca81aec47c9f06"));
@@ -395,10 +404,10 @@ public:
 
         nDefaultPort = 38333;
 
-        genesis = CreateGenesisBlock(1345083810, 1345090000, 122894938, 0x1d0fffff, 1, 0);
+        genesis = CreateGenesisBlock(1720080000, 1720080000, 1, 0x1e0ffff0, 1, 1000000000 * COIN); // Vertocoin SigNet genesis
         consensus.hashGenesisBlock = genesis.GetHash();
-        assert(consensus.hashGenesisBlock == uint256S("0x00000001f757bb737f6596503e17cd17b0658ce630cc727c0cca81aec47c9f06"));
-        assert(genesis.hashMerkleRoot == uint256S("0x3c2d8f85fab4d17aac558cc648a1a58acff0de6deb890c29985690052c5993c2"));
+        // assert(consensus.hashGenesisBlock == uint256S("0x6b0bea195c0dc4212b91aee36be332dbd6b59fc317ce744ae5a413a8d051b903"));
+        // assert(genesis.hashMerkleRoot == uint256S("0x6e4d62e871f3b3380995885ff3136712d4059fe3132e060c8a374acd2b63a278"));
 
         vFixedSeeds.clear();
 
@@ -502,11 +511,11 @@ public:
             consensus.vDeployments[deployment_pos].min_activation_height = version_bits_params.min_activation_height;
         }
 
-        genesis = CreateGenesisBlock(1345083810, 1345090000, 122894938, 0x1d0fffff, 1, 0);
+        genesis = CreateGenesisBlock(1720080000, 1720080000, 1, 0x1e0ffff0, 1, 1000000000 * COIN); // Vertocoin regtest genesis
 
         consensus.hashGenesisBlock = genesis.GetHash();
-        assert(consensus.hashGenesisBlock == uint256S("0x00000001f757bb737f6596503e17cd17b0658ce630cc727c0cca81aec47c9f06"));
-        assert(genesis.hashMerkleRoot == uint256S("0x3c2d8f85fab4d17aac558cc648a1a58acff0de6deb890c29985690052c5993c2"));
+        // assert(consensus.hashGenesisBlock == uint256S("0x6b0bea195c0dc4212b91aee36be332dbd6b59fc317ce744ae5a413a8d051b903"));
+        // assert(genesis.hashMerkleRoot == uint256S("0x6e4d62e871f3b3380995885ff3136712d4059fe3132e060c8a374acd2b63a278"));
 
         vFixedSeeds.clear(); //!< Regtest mode doesn't have any fixed seeds.
         vSeeds.clear();

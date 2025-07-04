@@ -13,8 +13,6 @@ services:
     volumes:
       - vertocoin_data:/home/vertocoin/.vertocoin
       # - ./vertocoin.conf:/home/vertocoin/.vertocoin/vertocoin.conf:ro
-    environment:
-      - VERTOCOIN_PRINTTOCONSOLE=1
     networks:
       - vertocoin-network
     healthcheck:

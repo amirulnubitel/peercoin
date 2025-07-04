@@ -21,7 +21,7 @@ services:
           "CMD",
           "vertocoin-cli",
           "-rpcuser=vertouser",
-          "-rpcpassword=vertouser2025",
+          "-rpcpassword=YoK5Euk2aXx5IqiWiux1jZ1I6THNXmxkdlPIkvEnRb4",
           "getblockchaininfo",
         ]
       interval: 30s
@@ -80,7 +80,7 @@ services:
       - BTCEXP_BITCOIND_HOST=vertocoind
       - BTCEXP_BITCOIND_PORT=9332
       - BTCEXP_BITCOIND_USER=vertouser
-      - BTCEXP_BITCOIND_PASS=vertouser2025
+      - BTCEXP_BITCOIND_PASS=YoK5Euk2aXx5IqiWiux1jZ1I6THNXmxkdlPIkvEnRb4
       - BTCEXP_COIN=VTO
       - BTCEXP_DISPLAY_CURRENCY=vto
       - BTCEXP_LOCAL_CURRENCY=USD

@@ -41,7 +41,7 @@ build_image() {
 
 start_node() {
     echo "Starting Vertocoin node..."
-    docker compose up -d vertocoind
+    docker compose up -d
     echo "Vertocoin node started!"
     echo "Waiting for node to be ready..."
     sleep 10

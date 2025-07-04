@@ -15,8 +15,6 @@ services:
       # - ./vertocoin.conf:/home/vertocoin/.vertocoin/vertocoin.conf:ro
     networks:
       - peercoin_vertocoin-network
-    depends_on:
-      - tor-proxy
     healthcheck:
       test:
         [
@@ -61,6 +59,8 @@ services:
       - "9050:9050" # SOCKS proxy port (bind to localhost only)
     networks:
       - peercoin_vertocoin-network
+    depends_on:
+      - vertocoind
     environment:
       - TOR_OPTS=--SocksPort 0.0.0.0:9050
     healthcheck:

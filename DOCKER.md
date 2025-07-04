@@ -14,16 +14,19 @@ This directory contains Docker configuration for running Vertocoin in containeri
 ### Building and Running
 
 1. **Build the Docker image:**
+
    ```bash
    ./docker-vertocoin.sh build
    ```
 
 2. **Start the Vertocoin node:**
+
    ```bash
    ./docker-vertocoin.sh start
    ```
 
 3. **Check the status:**
+
    ```bash
    ./docker-vertocoin.sh status
    ```
@@ -87,11 +90,13 @@ environment:
 Blockchain data is stored in a Docker volume named `vertocoin_data`. This ensures your blockchain data persists between container restarts.
 
 To backup your data:
+
 ```bash
 docker run --rm -v vertocoin_data:/data -v $(pwd):/backup ubuntu tar czf /backup/vertocoin-backup.tar.gz -C /data .
 ```
 
 To restore from backup:
+
 ```bash
 docker run --rm -v vertocoin_data:/data -v $(pwd):/backup ubuntu tar xzf /backup/vertocoin-backup.tar.gz -C /data
 ```
@@ -116,17 +121,17 @@ The default configuration allows RPC connections from any IP (`rpcallowip=0.0.0.
 
 The `docker-vertocoin.sh` script provides the following commands:
 
-| Command | Description |
-|---------|-------------|
-| `build` | Build the Docker image |
-| `start` | Start the Vertocoin node |
-| `stop` | Stop the Vertocoin node |
-| `restart` | Restart the Vertocoin node |
-| `logs` | Show container logs |
-| `status` | Show container and node status |
-| `cli [args]` | Run vertocoin-cli commands |
-| `shell` | Open a shell in the running container |
-| `clean` | Remove containers and images |
+| Command      | Description                           |
+| ------------ | ------------------------------------- |
+| `build`      | Build the Docker image                |
+| `start`      | Start the Vertocoin node              |
+| `stop`       | Stop the Vertocoin node               |
+| `restart`    | Restart the Vertocoin node            |
+| `logs`       | Show container logs                   |
+| `status`     | Show container and node status        |
+| `cli [args]` | Run vertocoin-cli commands            |
+| `shell`      | Open a shell in the running container |
+| `clean`      | Remove containers and images          |
 
 ## Troubleshooting
 

@@ -20,8 +20,8 @@ RUN apt-get update && apt-get install -y \
    python3 \
    python3-pip \
    libboost-all-dev \
-   libdb4.8-dev \
-   libdb4.8++-dev \
+   libdb5.3-dev \
+   libdb5.3++-dev \
    libminiupnpc-dev \
    libzmq3-dev \
    libqt5gui5 \
@@ -69,7 +69,7 @@ RUN apt-get update && apt-get install -y \
    libboost-filesystem1.74.0 \
    libboost-thread1.74.0 \
    libboost-chrono1.74.0 \
-   libdb4.8++ \
+   libdb5.3++ \
    libminiupnpc17 \
    libzmq5 \
    libevent-2.1-7 \
@@ -89,7 +89,7 @@ COPY --from=builder /vertocoin/src/vertocoind /usr/local/bin/
 COPY --from=builder /vertocoin/src/vertocoin-cli /usr/local/bin/
 COPY --from=builder /vertocoin/src/vertocoin-tx /usr/local/bin/
 COPY --from=builder /vertocoin/src/vertocoin-util /usr/local/bin/
-COPY --from=builder /app/build/src/vertocoin-wallet /usr/local/bin/
+COPY --from=builder /vertocoin/src/vertocoin-wallet /usr/local/bin/
 
 # Copy configuration file
 COPY --chown=vertocoin:vertocoin vertocoin.conf /home/vertocoin/.vertocoin/

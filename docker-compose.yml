@@ -56,7 +56,7 @@ services:
     container_name: vertocoin-tor-proxy
     restart: always
     ports:
-      - "127.0.0.1:9050:9050" # SOCKS proxy port (bind to localhost only)
+      - "9050:9050" # SOCKS proxy port (bind to localhost only)
     networks:
       - vertocoin-network
     environment:

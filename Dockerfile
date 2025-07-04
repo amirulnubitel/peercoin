@@ -46,18 +46,6 @@ RUN apt-get update && apt-get install -y \
    cmake \
    && rm -rf /var/lib/apt/lists/*
 
-# Install compatible version of miniupnpc from source (not the system package)
-# RUN cd /tmp && \
-#     wget http://miniupnp.free.fr/files/miniupnpc-2.0.tar.gz && \
-#     tar -xzf miniupnpc-2.0.tar.gz && \
-#     cd miniupnpc-2.0 && \
-#     make && \
-#     make install && \
-#     ldconfig && \
-#     cd / && \
-#     rm -rf /tmp/miniupnpc-*
-
-
 # Set working directory
 WORKDIR /vertocoin
 
@@ -120,11 +108,11 @@ RUN mkdir -p /home/vertocoin/.vertocoin && \
    chown -R vertocoin:vertocoin /home/vertocoin/.vertocoin
 
 # Copy binaries from builder stage
-COPY --from=builder /vertocoin/src/vertocoind /usr/local/bin/
-COPY --from=builder /vertocoin/src/vertocoin-cli /usr/local/bin/
-COPY --from=builder /vertocoin/src/vertocoin-tx /usr/local/bin/
-COPY --from=builder /vertocoin/src/vertocoin-util /usr/local/bin/
-COPY --from=builder /vertocoin/src/vertocoin-wallet /usr/local/bin/
+COPY --from=builder /vertocoin/src/peercoind /usr/local/bin/vertocoind
+COPY --from=builder /vertocoin/src/peercoin-cli /usr/local/bin/vertocoin-cli
+COPY --from=builder /vertocoin/src/peercoin-tx /usr/local/bin/vertocoin-tx
+COPY --from=builder /vertocoin/src/peercoin-util /usr/local/bin/vertocoin-util
+COPY --from=builder /vertocoin/src/peercoin-wallet /usr/local/bin/vertocoin-wallet
 
 # Copy configuration file
 COPY --chown=vertocoin:vertocoin vertocoin.conf /home/vertocoin/.vertocoin/

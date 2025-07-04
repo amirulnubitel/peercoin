@@ -13,6 +13,7 @@ RUN apt-get update && apt-get install -y \
    libtool \
    autotools-dev \
    automake \
+   autoconf \
    pkg-config \
    libssl-dev \
    libevent-dev \
@@ -46,8 +47,12 @@ COPY . .
 # Make build script executable
 RUN chmod +x build_vertocoin.sh
 
-# Generate configure script
-RUN ./autogen.sh
+# Ensure all test files are present and generate configure script
+RUN ls -la test/ && \
+   ls -la test/functional/ && \
+   ls -la test/util/ && \
+   ls -la test/fuzz/ && \
+   ./autogen.sh
 
 # Configure build
 RUN ./configure \
@@ -55,7 +60,8 @@ RUN ./configure \
    --disable-bench \
    --without-gui \
    --with-daemon \
-   --enable-hardening
+   --enable-hardening \
+   --disable-fuzz-binary
 
 # Build Vertocoin
 RUN make -j$(nproc)

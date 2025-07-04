@@ -47,11 +47,11 @@ services:
       - BTCEXP_BITCOIND_PORT=9332
       - BTCEXP_BITCOIND_USER=vertouser
       - BTCEXP_BITCOIND_PASS=vertouser2025
-      # - BTCEXP_DISPLAY_CURRENCY=vto
-      # - BTCEXP_LOCAL_CURRENCY=USD
-      # - BTCEXP_COIN=VTO
-      # - BTCEXP_ADDRESS_API=electrumx
-      # - BTCEXP_ELECTRUMX_SERVERS=tcp://electrumx:50001
+      - BTCEXP_COIN=VTC
+      - BTCEXP_DISPLAY_CURRENCY=vto
+      - BTCEXP_LOCAL_CURRENCY=USD
+      - BTCEXP_PRIVACY_MODE=false
+      - BTCEXP_NO_INMEMORY_RPC_CACHE=true
     networks:
       - vertocoin-network
     depends_on:
@@ -74,7 +74,9 @@ services:
       - vertocoin-network
     entrypoint:
       [
-        "vertocoin-cli -datadir=/home/vertocoin/.vertocoin -conf=/home/vertocoin/.vertocoin/vertocoin.conf",
+        "vertocoin-cli",
+        "-datadir=/home/vertocoin/.vertocoin",
+        "-conf=/home/vertocoin/.vertocoin/vertocoin.conf",
       ]
     command: ["--help"] # Default to showing help
 

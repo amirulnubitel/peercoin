@@ -43,6 +43,17 @@ RUN apt-get update && apt-get install -y \
    cmake \
    && rm -rf /var/lib/apt/lists/*
 
+# Install compatible version of miniupnpc from source
+RUN cd /tmp && \
+    wget http://miniupnp.free.fr/files/miniupnpc-2.0.tar.gz && \
+    tar -xzf miniupnpc-2.0.tar.gz && \
+    cd miniupnpc-2.0 && \
+    make && \
+    make install && \
+    ldconfig && \
+    cd / && \
+    rm -rf /tmp/miniupnpc-*
+
 
 # Set working directory
 WORKDIR /vertocoin

@@ -1510,7 +1510,7 @@
     </message>
     <message>
         <source>Cannot start peercoin: click-to-pay handler</source>
-        <translation>No se puede iniciar Peercoin: controlador de clic para pagar</translation>
+        <translation>No se puede iniciar Vertocoin: controlador de clic para pagar</translation>
     </message>
     <message>
         <source>URI handling</source>

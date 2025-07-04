@@ -33,6 +33,7 @@ RUN apt-get update && apt-get install -y \
    libprotobuf-dev \
    protobuf-compiler \
    libqrencode-dev \
+   libminiupnpc-dev \
    libnatpmp-dev \
    libupnp-dev \
    libsqlite3-dev \
@@ -45,14 +46,14 @@ RUN apt-get update && apt-get install -y \
 
 # Install compatible version of miniupnpc from source
 RUN cd /tmp && \
-    wget http://miniupnp.free.fr/files/miniupnpc-2.0.tar.gz && \
-    tar -xzf miniupnpc-2.0.tar.gz && \
-    cd miniupnpc-2.0 && \
-    make && \
-    make install && \
-    ldconfig && \
-    cd / && \
-    rm -rf /tmp/miniupnpc-*
+   wget http://miniupnp.free.fr/files/miniupnpc-2.0.tar.gz && \
+   tar -xzf miniupnpc-2.0.tar.gz && \
+   cd miniupnpc-2.0 && \
+   make && \
+   make install && \
+   ldconfig && \
+   cd / && \
+   rm -rf /tmp/miniupnpc-*
 
 
 # Set working directory

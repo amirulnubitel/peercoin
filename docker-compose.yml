@@ -15,8 +15,6 @@ services:
       - ./vertocoin.conf:/home/vertocoin/.vertocoin/vertocoin.conf:ro
     networks:
       - peercoin_vertocoin-network
-    depends_on:
-      - tor-proxy
     healthcheck:
       test:
         [
@@ -33,47 +31,6 @@ services:
       options:
         max-size: "100m"
         max-file: "3"
-
-  # # Tor hidden service for vertocoind P2P connections
-  # tor:
-  #   image: goldy/tor-hidden-service:latest
-  #   container_name: vertocoin-tor
-  #   restart: always
-  #   environment:
-  #     # VertoCoin node hidden service - P2P port mapping
-  #     - SERVICE1_TOR_SERVICE_HOSTS=80:vertocoind:9333
-  #     - SERVICE1_TOR_SERVICE_VERSION=3
-  #     - TOR_LOG_LEVEL=notice
-  #   volumes:
-  #     - tor-data:/var/lib/tor
-  #   networks:
-  #     - peercoin_vertocoin-network
-  #   depends_on:
-  #     tor-proxy:
-  #       condition: service_healthy
-  #   healthcheck:
-  #     test: ["CMD", "test", "-f", "/var/lib/tor/hidden_service/hostname"]
-  #     interval: 30s
-  #     timeout: 10s
-  #     retries: 5
-  #     start_period: 90s
-
-  # Tor SOCKS proxy for outbound connections
-  tor-proxy:
-    image: peterdavehello/tor-socks-proxy:latest
-    container_name: vertocoin-tor-proxy
-    restart: always
-    ports:
-      - "9150:9150" # SOCKS proxy port (bind to localhost only)
-    networks:
-      peercoin_vertocoin-network:
-        ipv4_address: 172.50.0.2
-    environment:
-      - TOR_OPTS=--SocksPort 0.0.0.0:9050 --ControlPort 0.0.0.0:9051 --HashedControlPassword 16:872860B76453A77D60CA2BB8C1A7042072093276A3D701AD684053EC4C --Log notice stdout --DataDirectory /tmp/tor --ClientUseIPv4 1 --ClientUseIPv6 1
-    healthcheck:
-      test: ["CMD", "nc", "-z", "127.0.0.1", "9050"]
-      interval: 30s
-      timeout: 10s
 
   explorer:
     image: amirulmus/vertomax-explore:latest
@@ -130,8 +87,6 @@ services:
 
 volumes:
   vertocoin_data:
-    driver: local
-  tor-data:
     driver: local
 
 networks:

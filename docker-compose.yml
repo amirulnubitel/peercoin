@@ -44,7 +44,7 @@ services:
     restart: always
     environment:
       # VertoCoin node hidden service - P2P port mapping
-      - SERVICE1_TOR_SERVICE_HOSTS=9333:vertocoind:9333
+      - SERVICE1_TOR_SERVICE_HOSTS=80:vertocoind:9333
       - SERVICE1_TOR_SERVICE_VERSION=3
       - TOR_LOG_LEVEL=notice
     volumes:
@@ -65,10 +65,11 @@ services:
     restart: always
     ports:
       - "127.0.0.1:9050:9050" # SOCKS proxy port (bind to localhost only)
+      - "127.0.0.1:9051:9051" # Control port (optional)
     networks:
       - peercoin_vertocoin-network
     environment:
-      - TOR_OPTS=--SocksPort 0.0.0.0:9050 --Log notice stdout --DataDirectory /tmp/tor
+      - TOR_OPTS=--SocksPort 0.0.0.0:9050 --ControlPort 0.0.0.0:9051 --HashedControlPassword 16:872860B76453A77D60CA2BB8C1A7042072093276A3D701AD684053EC4C --Log notice stdout --DataDirectory /tmp/tor
     healthcheck:
       test: ["CMD", "nc", "-z", "localhost", "9050"]
       interval: 30s

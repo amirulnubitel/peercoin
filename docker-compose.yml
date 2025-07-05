@@ -36,23 +36,28 @@ services:
         max-size: "100m"
         max-file: "3"
 
-  # Tor proxy for enhanced privacy
+  # Tor hidden service for vertocoind P2P connections
   tor:
     image: goldy/tor-hidden-service:latest
     container_name: vertocoin-tor
     restart: always
     environment:
-      # VertoCoin node hidden service (corrected service name)
-      - SERVICE1_TOR_SERVICE_HOSTS=80:vertocoind:9333
+      # VertoCoin node hidden service - P2P port mapping
+      - SERVICE1_TOR_SERVICE_HOSTS=9333:vertocoind:9333
       - SERVICE1_TOR_SERVICE_VERSION=3
-      # Optional: Set a custom private key (leave empty for auto-generation)
-      # - SERVICE1_TOR_SERVICE_KEY=<your_private_key>
+      - TOR_LOG_LEVEL=notice
     volumes:
       - tor-data:/var/lib/tor
     depends_on:
       - vertocoind
     networks:
       - peercoin_vertocoin-network
+    healthcheck:
+      test: ["CMD", "test", "-f", "/var/lib/tor/hidden_service/hostname"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
 
   # Tor SOCKS proxy for outbound connections
   tor-proxy:

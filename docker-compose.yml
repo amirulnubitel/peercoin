@@ -29,8 +29,8 @@ services:
         ]
       interval: 30s
       timeout: 10s
-      retries: 3
-      start_period: 60s
+      retries: 5
+      start_period: 120s
     logging:
       driver: "json-file"
       options:
@@ -51,12 +51,15 @@ services:
       - tor-data:/var/lib/tor
     networks:
       - peercoin_vertocoin-network
+    depends_on:
+      tor-proxy:
+        condition: service_healthy
     healthcheck:
       test: ["CMD", "test", "-f", "/var/lib/tor/hidden_service/hostname"]
       interval: 30s
       timeout: 10s
-      retries: 3
-      start_period: 60s
+      retries: 5
+      start_period: 90s
 
   # Tor SOCKS proxy for outbound connections
   tor-proxy:
@@ -67,15 +70,16 @@ services:
       - "127.0.0.1:9050:9050" # SOCKS proxy port (bind to localhost only)
       - "127.0.0.1:9051:9051" # Control port (optional)
     networks:
-      - peercoin_vertocoin-network
+      peercoin_vertocoin-network:
+        ipv4_address: 172.50.0.2
     environment:
-      - TOR_OPTS=--SocksPort 0.0.0.0:9050 --ControlPort 0.0.0.0:9051 --HashedControlPassword 16:872860B76453A77D60CA2BB8C1A7042072093276A3D701AD684053EC4C --Log notice stdout --DataDirectory /tmp/tor
+      - TOR_OPTS=--SocksPort 0.0.0.0:9050 --ControlPort 0.0.0.0:9051 --HashedControlPassword 16:872860B76453A77D60CA2BB8C1A7042072093276A3D701AD684053EC4C --Log notice stdout --DataDirectory /tmp/tor --ClientUseIPv4 1 --ClientUseIPv6 1
     healthcheck:
-      test: ["CMD", "nc", "-z", "localhost", "9050"]
+      test: ["CMD", "nc", "-z", "127.0.0.1", "9050"]
       interval: 30s
       timeout: 10s
-      retries: 3
-      start_period: 30s
+      retries: 5
+      start_period: 45s
 
   explorer:
     image: amirulmus/vertomax-explore:latest
@@ -142,3 +146,4 @@ networks:
     ipam:
       config:
         - subnet: 172.50.0.0/16
+          gateway: 172.50.0.1

@@ -16,7 +16,8 @@ services:
     networks:
       - peercoin_vertocoin-network
     depends_on:
-      - tor-proxy
+      tor-proxy:
+        condition: service_healthy
     healthcheck:
       test:
         [
@@ -48,8 +49,6 @@ services:
       - TOR_LOG_LEVEL=notice
     volumes:
       - tor-data:/var/lib/tor
-    depends_on:
-      - vertocoind
     networks:
       - peercoin_vertocoin-network
     healthcheck:
@@ -65,11 +64,11 @@ services:
     container_name: vertocoin-tor-proxy
     restart: always
     ports:
-      - "9050:9050" # SOCKS proxy port (bind to localhost only)
+      - "127.0.0.1:9050:9050" # SOCKS proxy port (bind to localhost only)
     networks:
       - peercoin_vertocoin-network
     environment:
-      - TOR_OPTS=--SocksPort 0.0.0.0:9050 --Log notice stdout
+      - TOR_OPTS=--SocksPort 0.0.0.0:9050 --Log notice stdout --DataDirectory /tmp/tor
     healthcheck:
       test: ["CMD", "nc", "-z", "localhost", "9050"]
       interval: 30s

@@ -64,8 +64,7 @@ services:
     container_name: vertocoin-tor-proxy
     restart: always
     ports:
-      - "9050:9050" # SOCKS proxy port (bind to localhost only)
-      - "9051:9051" # Control port (optional)
+      - "9150:9150" # SOCKS proxy port (bind to localhost only)
     networks:
       peercoin_vertocoin-network:
         ipv4_address: 172.50.0.2
